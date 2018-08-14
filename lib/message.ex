@@ -13,7 +13,6 @@ defmodule Message do
     %Message{m | history: history, status: new_status}
   end
 
-
   def start_link(message) do
     GenServer.start_link(__MODULE__, message)
   end
@@ -24,5 +23,9 @@ defmodule Message do
 
   def handle_cast({:set_next, pid}, %Message{} = m) do
     {:noreply, %Message{m | next_message: pid}}
+  end
+
+  def handle_call(:get, _from, %Message{} = m) do
+    {:reply, m, m}
   end
 end
