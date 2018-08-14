@@ -1,10 +1,13 @@
-defmodule Message.Application do
-    use Application
+defmodule Queue.Application do
+  use Application
 
-    def start(_type, _args) do
-      children = [
-        {DynamicSupervisor, strategy: :one_for_one, name: Message.Supervisor}
-      ]
-      Supervisor.start_link(children, strategy: :one_for_one)
-    end
+  def start(_type, _args) do
+    children = [
+      %{
+        id: Queue,
+        start: {Queue, :start_link, []}
+      }
+    ]
+    Supervisor.start_link(children, strategy: :one_for_one)
   end
+end

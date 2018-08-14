@@ -11,6 +11,23 @@ defmodule Queue do
     :ok = Queue |> GenServer.cast({:add_message, content})
   end
 
+
+  defp new_message(content) do
+    message = %Message{content: content}
+    {:ok, pid} = Message |> GenServer.start_link(message)
+    pid
+  end
+
+    def start_link() do
+      GenServer.start_link(__MODULE__, %Queue{}, name: Queue)
+    end
+
+    # Server
+
+  def init(q) do
+    {:ok, q}
+  end
+
   def handle_cast({:add_message, content}, %Queue{} = q) do
     pid = new_message(content)
     new_q = case q.last do
@@ -23,25 +40,5 @@ defmodule Queue do
     end
     {:noreply, new_q}
   end
-
-  defp new_message(content) do
-    message = %Message{content: content}
-    {:ok, pid} = Message.Supervisor |> DynamicSupervisor.start_child(%{
-      id: Message,
-      start: {Message, :start_link, [message]},
-    })
-    pid
-  end
-
-    def start_link() do
-      # function is a part of the child spec, to be used by the supervisor
-      GenServer.start_link(__MODULE__, %Queue{}, name: Queue)
-    end
-
-    # Server
-
-    def init(q) do
-      {:ok, q}
-    end
 
 end

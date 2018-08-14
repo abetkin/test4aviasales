@@ -15,7 +15,6 @@ defmodule Message do
 
 
   def start_link(message) do
-    # function is a part of the child spec, to be used by the supervisor
     GenServer.start_link(__MODULE__, message)
   end
 

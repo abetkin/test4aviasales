@@ -14,7 +14,7 @@ defmodule Message.MixProject do
   def application do
     [
       extra_applications: [:logger],
-      mod: {Message.Application, []}
+      mod: {Queue.Application, []}
     ]
   end
 
