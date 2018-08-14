@@ -14,10 +14,6 @@ defmodule Queue do
     Queue |> GenServer.call(:get)
   end
 
-  def ack() do
-    Queue |> GenServer.cast(:ack)
-  end
-
   def add_message(%Queue{first: nil, last: nil}, pid) do
     %Queue{first: pid, last: pid}
   end
@@ -84,8 +80,9 @@ defmodule Queue do
   end
 
   def handle_cast({:reject, pid}, %Queue{} = q) do
-    pid |> GenServer.cast(:reject)
     new_q = q |> add_message(pid)
+    pid |> GenServer.cast(:reject)
+
     {:noreply, new_q}
   end
 

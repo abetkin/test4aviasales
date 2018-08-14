@@ -21,8 +21,12 @@ defmodule Message do
     {:ok, message}
   end
 
-  def handle_cast({:set_next, pid}, %Message{} = m) do
+  def handle_cast({:set_next, pid}, %Message{status: :created} = m) do
     {:noreply, %Message{m | next_pid: pid}}
+  end
+
+  def handle_cast({:set_next, _pid}, %Message{} = m) do
+    {:noreply, m} # no-op
   end
 
   def handle_call(:get, _from, %Message{} = m) do
