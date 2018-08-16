@@ -39,3 +39,5 @@ iex(7)> pid(0,180,0) |> send(:reject)
 iex(8)> Queue |> :sys.get_state
 #Qex<[%Message{content: "you", history: [:reject]}]>
 ```
+
+Была использована библиотека [Qex](https://github.com/princemaple/elixir-queue)
