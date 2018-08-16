@@ -6,6 +6,14 @@ defmodule Queue do
     GenServer.start_link(__MODULE__, Qex.new(), name: Queue)
   end
 
+  def add(msg) do
+    Queue |> GenServer.cast({:add, msg})
+  end
+
+  def get() do
+    Queue |> GenServer.call(:get)
+  end
+
   def init(q) do
     {:ok, q}
   end
@@ -24,7 +32,7 @@ defmodule Queue do
   def handle_call(:get, _from, q) do
     {{:value, m}, new_q} = q |> Qex.pop()
     pid = Message.spawn(m)
-    {:reply, {pid, m}, new_q}
+    {:reply, {pid, m.content}, new_q}
   end
 
 end
