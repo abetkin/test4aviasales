@@ -3,7 +3,7 @@ defmodule Message.MixProject do
 
   def project do
     [
-      app: :message,
+      app: :msg,
       version: "0.1.0",
       elixir: "~> 1.6",
       start_permanent: Mix.env() == :prod,
@@ -20,7 +20,7 @@ defmodule Message.MixProject do
 
   defp deps do
     [
-      {:gen_state_machine, "~> 2.0.2"}
+      {:qex, "~> 0.4"},
     ]
   end
 

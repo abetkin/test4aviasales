@@ -1,55 +1,32 @@
-defmodule Message do
-  use GenServer
 
+defmodule Message do
   defstruct [
-    next_pid: nil, # in queue
-    status: :created,
     content: nil,
     history: [],
   ]
 
-  def set_status(%Message{} = m, new_status) do
-    history = [m.status | m.history]
-    %Message{m | history: history, status: new_status}
+  @timeout 1000 * 60 # 60 sec
+
+  def spawn(msg) do
+    Kernel.spawn(__MODULE__, :run, [msg])
   end
 
-  def start_link(message) do
-    GenServer.start_link(__MODULE__, message)
+  def run(msg) do
+    try do
+      receive do
+        :ack -> :ok
+        :reject -> on_error(msg, :reject)
+      after @timeout ->
+        on_error(msg, :timeout)
+      end
+    rescue
+      e -> on_error(msg, e)
+    end
   end
 
-  def init(message) do
-    {:ok, message}
-  end
-
-  def handle_cast({:set_next, pid}, %Message{status: :created} = m) do
-    {:noreply, %Message{m | next_pid: pid}}
-  end
-
-  def handle_cast({:set_next, _pid}, %Message{} = m) do
-    {:noreply, m} # no-op
-  end
-
-  def handle_call(:get, _from, %Message{} = m) do
-    new_m = %Message{m | status: :processing}
-    {:reply, m, new_m}
-  end
-
-  def handle_cast(:ack, %Message{status: :processing} = m) do
-    new_m = %Message{m | status: :success}
-    # Save to "the log"
-    IO.inspect(new_m)
-    {:stop, :normal, new_m}
-  end
-
-  def handle_cast(:reject, %Message{status: :processing} = m) do
-    # Save to "the log"
-    %Message{m | status: :error} |> IO.inspect
-    history = [:error | m.history]
-    new_m = %Message{m |
-      status: :created,
-      history: history,
-      next_pid: nil,
-    }
-    {:noreply, new_m}
+  defp on_error(msg, e) do
+    new_m = %Message{msg | history: [e | msg.history]}
+    Queue |> GenServer.cast({:add, new_m})
+    :error
   end
 end
