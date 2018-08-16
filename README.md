@@ -23,9 +23,9 @@ iex(4)> Queue.get
 Ответ содержит pid процесса, которому нужно отправить результат обработки, и текст сообщения. Если процессу было отправлено `:ack`, он просто завершается.
 
 ```elixir
-iex(9)> pid(0,195,0) |> send(:ack)
+iex(5)> pid(0,195,0) |> send(:ack)
 :ack
-iex(10)> Queue |> :sys.get_state
+iex(6)> Queue |> :sys.get_state
 #Qex<[
   %Message{content: "you", history: []},
 ]>
